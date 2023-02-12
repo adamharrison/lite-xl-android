@@ -34,13 +34,14 @@ declare -a TARGETS=("armv7a-linux-androideabi" "i686-linux-android" "aarch64-lin
 declare -a JNILIBS=("armeabi-v7a" "x86" "arm64-v8a" "x86_64")
 declare -a LITELIBS=("arm-android" "x86-android" "aarch64-android" "x86_64-android")
 WD=`pwd`
+[[ "$VERSION" == "" ]] && VERSION="2.1.1"
 for TARGET_IDX in {0..3}; do
   export TARGET=${TARGETS[TARGET_IDX]}
   export JNILIB=${JNILIBS[TARGET_IDX]}
   export LITELIB=${LITELIBS[TARGET_IDX]}
-  export VERSION=2.1.1-$LITELIB-`git rev-parse --short HEAD`
+  export FULL_VERSION=$VERSION-$LITELIB
   if [[ $REBUILD_LITE != "" || ! -f $APP/app/src/main/jniLibs/$JNILIB/libmain.so ]]; then
-    (cd lib/lite-xl-simplified && rm -f lite.so && ./build.sh clean && CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$TARGET$ANDROID_ARCH-clang AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar BIN='lite.so' LLFLAGS="-fPIC" ./build.sh -DLITE_VERSION='"'$VERSION'"' -L$WD/$APP/app/build/intermediates/ndkBuild/$BUILD_FOLDER/obj/local/$JNILIB -lSDL2 -fPIC -Ilib/SDL/include -lSDL2 -shared $@ -DNO_SDL;) || exit -1
+    (cd lib/lite-xl-simplified && rm -f lite.so && ./build.sh clean && CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$TARGET$ANDROID_ARCH-clang AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar BIN='lite.so' LLFLAGS="-fPIC" ./build.sh -DLITE_VERSION='"'$FULL_VERSION'"' -L$WD/$APP/app/build/intermediates/ndkBuild/$BUILD_FOLDER/obj/local/$JNILIB -lSDL2 -fPIC -Ilib/SDL/include -lSDL2 -shared $@ -DNO_SDL;) || exit -1
     mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv lib/lite-xl-simplified/lite.so $APP/app/src/main/jniLibs/$JNILIB/libmain.so
   fi
 done

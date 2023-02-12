@@ -24,9 +24,9 @@ jobs:
           if [[ `git tag --points-at HEAD | head -c 1` == "v" ]]; then
             export VERSION=`git describe --tags --abbrev=0 --match "v*" | tail -c +2`
             gh release delete -y v$VERSION || true;
-            gh release create -t v$VERSION v$VERSION bin/*
+            gh release create -t v$VERSION v$VERSION *.apk
             gh release delete -y latest || true;
-            gh release create -t latest latest bin/*
+            gh release create -t latest latest *.apk
             git branch -f latest HEAD
             git tag -f latest
             git push -f origin refs/heads/latest
