@@ -1,0 +1,3 @@
+[submodule "lib/lite-xl-simplified"]
+	path = lib/lite-xl-simplified
+	url = https://github.com/adamharrison/lite-xl-simplified.git
