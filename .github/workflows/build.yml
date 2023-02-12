@@ -16,6 +16,7 @@ jobs:
         env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |
           git config --global user.name "Github Actions" && git config --global user.email "adamdharrison@gmail.com"
+          sudo apt-get install -y openjdk-11-jdk
           ./build.sh
           if [[ `git tag --points-at HEAD | head -c 1` == "v" ]]; then
             export VERSION=`git describe --tags --abbrev=0 --match "v*" | tail -c +2`
