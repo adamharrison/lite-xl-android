@@ -86,6 +86,8 @@ ifeq ($(NDK_DEBUG),1)
 endif
 
 LOCAL_STATIC_LIBRARIES := cpufeatures
+LOCAL_SHARED_LIBRARIES := libmain
+
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -99,7 +101,7 @@ LOCAL_MODULE := SDL2_static
 
 LOCAL_MODULE_FILENAME := libSDL2
 
-LOCAL_LDLIBS := 
+LOCAL_LDLIBS :=
 LOCAL_EXPORT_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_STATIC_LIBRARY)

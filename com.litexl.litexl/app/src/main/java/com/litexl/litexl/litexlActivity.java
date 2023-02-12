@@ -1,4 +1,4 @@
-package com.litexl.liteexl;
+package com.litexl.litexl;
 
 import org.libsdl.app.SDLActivity;
 import android.content.res.AssetManager;

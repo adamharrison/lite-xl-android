@@ -30,8 +30,10 @@ for TARGET_IDX in {0..3}; do
   export JNILIB=${JNILIBS[TARGET_IDX]}
   export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$TARGET$ANDROID_ARCH-clang
   export AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
-  (cd lib/lite-xl-simplified && ./build.sh clean && CFLAGS="-Ilib/SDL/include" ./build.sh $@ -DNO_SDL -DNO_LINK && $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar -r liblite.a src/*.o src/api/*.o;) || exit -1
-  mkdir -p com.litexl.litexl/app/jni/src/lib/$JNILIB && mv lib/lite-xl-simplified/liblite.a com.litexl.litexl/app/jni/src/lib/$JNILIB/liblite.a
+  if [[ ! -f com.litexl.litexl/app/jni/src/lib/$JNILIB/libmain.so ]]; then
+    (cd lib/lite-xl-simplified && rm -f lite.so && ./build.sh clean && CFLAGS="-Ilib/SDL/include -fPIC" LLFLAGS='-fPIC' BIN='lite.so' ./build.sh -shared $@ -DNO_SDL;) || exit -1
+    mkdir -p com.litexl.litexl/app/jni/src/lib/$JNILIB && mv lib/lite-xl-simplified/lite.so com.litexl.litexl/app/jni/src/lib/$JNILIB/libmain.so
+  fi
 done
 
 (cd com.litexl.litexl && ./gradlew assemble$BUILD_TYPE) || { echo "Can't build gradle." && exit -1; }
