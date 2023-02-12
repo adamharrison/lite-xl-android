@@ -28,7 +28,7 @@ public class litexlActivity extends SDLActivity {
             if (!file.exists() && !file.mkdirs())
                 throw new IOException("Can't make directory " + file.getPath());
             copyDirectoryOrFile(getAssets(), "data", getExternalFilesDir("share") + "/lite-xl");
-            copyDirectoryOrFile(getAssets(), "user", userdir + "/lite-xl");
+            // copyDirectoryOrFile(getAssets(), "user", userdir + "/lite-xl");
         } catch (IOException e) {
             Log.e("assetManager", "Failed to copy assets: " + e.getMessage());
         }
