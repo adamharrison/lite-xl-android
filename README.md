@@ -13,3 +13,10 @@ In order to build, simply ensure:
 3. Set `$LITEXL_PLUGINS` to a space separated list of all the plugins you'd like to bundle into this android build.
 
 Then do `./build.sh -g` to produce a debug build. Or `./build.sh` to produce a `lite-xl.apk` in the main directory.
+
+## Releases
+
+Release APKs are available for armv7a, arm64-v8a, x86, x86_64 android. These are debug APKs, because they are not signed.
+
+I may eventually get an android developer account to sign things.
+
