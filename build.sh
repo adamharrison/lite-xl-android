@@ -19,11 +19,12 @@ BUILD_TYPE=Debug && BUILD_FOLDER=debug
 [[ ! -d $APP ]] && cp -r $SDL/android-project $APP && mkdir -p $APP/app/jni/SDL && cp $SDL/Android.mk $APP/app/jni/SDL && rm -rf $APP/app/jni/src && cp -r template/* $APP
 
 # Install all desired plugins, if any.
-ASSET_FOLDER="$APP/app/src/main/assets" && rm -rf $ASSET_FOLDER/user && mkdir $ASSET_FOLDER/user
-if [[ "$LITEXL_PLUGINS" != "" ]]; then
+ASSET_FOLDER="$APP/app/src/main/assets"
+[[ "$LITEXL_PLUGINS" != "persist" ]] && rm -rf $ASSET_FOLDER/user && mkdir $ASSET_FOLDER/user
+if [[ "$LITEXL_PLUGINS" != "" && "$LITEXL_PLUGINS" != "persist" ]]; then
   [[ ! -e "lpm" ]] && { curl -L https://github.com/lite-xl/lite-xl-plugin-manager/releases/download/latest/lpm.x86_64-linux > lpm && chmod +x lpm  || { echo "Unable to download lpm." && exit -1; }; }
   LPM_ARGUMENTS="--userdir $ASSET_FOLDER/user --arch x86-android --arch x86_64-android --arch aarch64-android --arch arm-android"
-  ./lpm install $LITEXL_PLUGINS $LPM_ARGUMENTS && ./lpm purge $LPM_ARGUMENTS || { echo "Can't install $LITEXL_PLUGINS." && exit -1; }
+  ./lpm --cachedir /tmp/lpmandroid install $LITEXL_PLUGINS $LPM_ARGUMENTS || { echo "Can't install $LITEXL_PLUGINS." && exit -1; }
 fi
 
 # Build without our library, because we need to link against SDL.so that gets built.
@@ -44,7 +45,23 @@ for TARGET_IDX in {0..3}; do
     (cd lib/lite-xl-simplified && rm -f lite.so && ./build.sh clean && CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$TARGET$ANDROID_ARCH-clang AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar BIN='lite.so' LLFLAGS="-fPIC" ./build.sh -DLITE_VERSION='"'$FULL_VERSION'"' -L$WD/$APP/app/build/intermediates/ndkBuild/$BUILD_FOLDER/obj/local/$JNILIB -lSDL2 -fPIC -Ilib/SDL/include -lSDL2 -shared $@ -DNO_SDL;) || exit -1
     mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv lib/lite-xl-simplified/lite.so $APP/app/src/main/jniLibs/$JNILIB/libmain.so
   fi
+  for BINARY in $(find $ASSET_FOLDER/user -iname "*.$LITELIB"); do
+    FILENAME=$(basename $BINARY | sed 's/\..*-android//')
+    mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv $BINARY $APP/app/src/main/jniLibs/$JNILIB/$FILENAME.so
+  done
 done
+
+rm -f $ASSET_FOLDER/user/init.lua
+if [[ "$LITEXL_USERINIT" != "" ]]; then
+  mkdir -p $ASSET_FOLDER/user
+  echo 'local core = require "core"
+local keymap = require "core.keymap"
+local config = require "core.config"
+local style = require "core.style"
+
+' > $ASSET_FOLDER/user/init.lua
+  echo $LITEXL_USERINIT >> $ASSET_FOLDER/user/init.lua
+fi
 
 (cd $APP && ./gradlew assemble$BUILD_TYPE) || { echo "Can't build gradle." && exit -1; }
 

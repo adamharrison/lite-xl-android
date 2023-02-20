@@ -23,12 +23,13 @@ public class litexlActivity extends SDLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         String prefix = getExternalFilesDir(null) + "";
         String userdir = getExternalFilesDir("user") + "";
+        String libdir = getApplicationInfo().nativeLibraryDir;
         File file = new File(getExternalFilesDir("files") + "");
         try {
             if (!file.exists() && !file.mkdirs())
                 throw new IOException("Can't make directory " + file.getPath());
             copyDirectoryOrFile(getAssets(), "data", getExternalFilesDir("share") + "/lite-xl");
-            // copyDirectoryOrFile(getAssets(), "user", userdir + "/lite-xl");
+            copyDirectoryOrFile(getAssets(), "user", userdir);
         } catch (IOException e) {
             Log.e("assetManager", "Failed to copy assets: " + e.getMessage());
         }
@@ -39,8 +40,10 @@ public class litexlActivity extends SDLActivity {
         nativeSetenv("HOME", prefix);
         Log.i("litexl", "Setting LITE_SCALE to 1.0");
         nativeSetenv("LITE_SCALE", "2.0");
-        Log.i("litexl", "Setting XDG_CONFIG_HOME to " + userdir);
-        nativeSetenv("XDG_CONFIG_HOME", userdir);
+        Log.i("litexl", "Setting LITE_USERDIR to " + userdir);
+        nativeSetenv("LITE_USERDIR", userdir);
+        Log.i("litexl", "Setting PATH to " + libdir);
+        nativeSetenv("PATH", libdir);
 
         getWindow().setDecorFitsSystemWindows(false);
         WindowInsetsController controller = getWindow().getInsetsController();

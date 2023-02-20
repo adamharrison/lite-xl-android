@@ -45,6 +45,11 @@ android {
         }
 
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
     lintOptions {
         abortOnError false
     }
