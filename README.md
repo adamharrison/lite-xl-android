@@ -20,5 +20,9 @@ Then do `./build.sh` to produce `lite-xl.apk` in the main directory.
 
 Release APKs are available for `armv7a`, `arm64-v8a`, `x86`, `x86_64` android. This is a debug APK, because it's not signed.
 
+By default releases include the following plugins:
+
+* `plugin_manager`
+
 I may eventually get an android developer account to sign things, if I can get a reasonable android implementation going.
 
