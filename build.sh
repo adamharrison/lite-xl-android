@@ -23,8 +23,9 @@ ASSET_FOLDER="$APP/app/src/main/assets"
 [[ "$LITEXL_PLUGINS" != "persist" ]] && rm -rf $ASSET_FOLDER/user && mkdir $ASSET_FOLDER/user
 if [[ "$LITEXL_PLUGINS" != "" && "$LITEXL_PLUGINS" != "persist" ]]; then
   [[ ! -e "lpm" ]] && { curl -L https://github.com/lite-xl/lite-xl-plugin-manager/releases/download/latest/lpm.x86_64-linux > lpm && chmod +x lpm  || { echo "Unable to download lpm." && exit -1; }; }
-  LPM_ARGUMENTS="--userdir $ASSET_FOLDER/user --arch x86-android --arch x86_64-android --arch aarch64-android --arch arm-android"
-  ./lpm --cachedir /tmp/lpmandroid install $LITEXL_PLUGINS $LPM_ARGUMENTS || { echo "Can't install $LITEXL_PLUGINS." && exit -1; }
+  LPM_ARGUMENTS="--userdir $ASSET_FOLDER/user --arch x86-android --arch x86_64-android --arch aarch64-android --arch arm-android  --cachedir /tmp/lpmandroid"
+  [[ "$LITEXL_REPOS" != "" ]] && ./lpm $LPM_ARGUMENTS add $LITEXL_REPOS
+  ./lpm install $LITEXL_PLUGINS $LPM_ARGUMENTS || { echo "Can't install $LITEXL_PLUGINS." && exit -1; }
 fi
 
 # Build without our library, because we need to link against SDL.so that gets built.
