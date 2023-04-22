@@ -23,7 +23,7 @@ ASSET_FOLDER="$APP/app/src/main/assets"
 [[ "$LITEXL_PLUGINS" != "persist" ]] && rm -rf $ASSET_FOLDER/user && mkdir $ASSET_FOLDER/user
 if [[ "$LITEXL_PLUGINS" != "" && "$LITEXL_PLUGINS" != "persist" ]]; then
   [[ ! -e "lpm" ]] && { curl -L https://github.com/lite-xl/lite-xl-plugin-manager/releases/download/latest/lpm.x86_64-linux > lpm && chmod +x lpm  || { echo "Unable to download lpm." && exit -1; }; }
-  LPM_ARGUMENTS="--userdir $ASSET_FOLDER/user --arch x86-android --arch x86_64-android --arch aarch64-android --arch arm-android  --cachedir /tmp/lpmandroid"
+  LPM_ARGUMENTS="--userdir $ASSET_FOLDER/user --arch x86-android --arch x86_64-android --arch aarch64-android --arch arm-android  --cachedir /tmp/lpmandroid --verbose"
   [[ "$LITEXL_REPOS" != "" ]] && ./lpm $LPM_ARGUMENTS add $LITEXL_REPOS
   ./lpm install $LITEXL_PLUGINS $LPM_ARGUMENTS || { echo "Can't install $LITEXL_PLUGINS." && exit -1; }
 fi
@@ -46,9 +46,9 @@ for TARGET_IDX in {0..3}; do
     (cd lib/lite-xl-simplified && rm -f lite.so && ./build.sh clean && CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/$TARGET$ANDROID_ARCH-clang AR=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar BIN='lite.so' LLFLAGS="-fPIC" ./build.sh -DLITE_VERSION='"'$FULL_VERSION'"' -L$WD/$APP/app/build/intermediates/ndkBuild/$BUILD_FOLDER/obj/local/$JNILIB -lSDL2 -fPIC -Ilib/SDL/include -lSDL2 -shared $@ -DNO_SDL;) || exit -1
     mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv lib/lite-xl-simplified/lite.so $APP/app/src/main/jniLibs/$JNILIB/libmain.so
   fi
-  for BINARY in $(find $ASSET_FOLDER/user -iname "*.$LITELIB"); do
+  for BINARY in $(find $ASSET_FOLDER/user -iname "*.$LITELIB.so"); do
     FILENAME=$(basename $BINARY | sed 's/\..*-android//')
-    mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv $BINARY $APP/app/src/main/jniLibs/$JNILIB/$FILENAME.so
+    mkdir -p $APP/app/src/main/jniLibs/$JNILIB && mv $BINARY $APP/app/src/main/jniLibs/$JNILIB/$FILENAME
   done
 done
 
